@@ -1,0 +1,2196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="author" content="VtDcs">
+    <meta name="description" content="Laranjex Network - IP Intelligence e ferramentas de análise de rede">
+
+    <title>Laranjex Network - IP Intelligence</title>
+
+    <style>
+        :root {
+            --bg: #0c0804;
+            --panel: #171008;
+            --panel-2: #211408;
+            --orange: #ff7800;
+            --orange-light: #ffad45;
+            --text: #fff7ed;
+            --muted: #bba996;
+            --border: rgba(255, 145, 40, 0.20);
+            --green: #5de3a0;
+            --yellow: #ffd166;
+            --red: #ff6b6b;
+        }
+
+        * { box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--text);
+            background:
+                radial-gradient(circle at 10% 0%, #3b1a03 0, transparent 30%),
+                radial-gradient(circle at 100% 20%, #2b1302 0, transparent 30%),
+                var(--bg);
+            font-family: Inter, Arial, Helvetica, sans-serif;
+        }
+
+        button, input { font: inherit; }
+        button { cursor: pointer; }
+
+        button:focus-visible, input:focus-visible {
+            outline: 2px solid var(--orange);
+            outline-offset: 2px;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            border-bottom: 1px solid var(--border);
+            background: rgba(12, 8, 4, 0.90);
+            backdrop-filter: blur(14px);
+        }
+
+        .nav {
+            width: min(1400px, 92%);
+            margin: auto;
+            min-height: 78px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .brand {
+            font-size: 22px;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
+        .brand span { color: var(--orange); }
+
+        .nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            justify-content: flex-end;
+        }
+
+        .nav-links button, .btn {
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            padding: 10px 14px;
+            color: var(--text);
+            background: #211307;
+            font-weight: 800;
+            transition: transform .15s ease, border-color .15s ease;
+        }
+
+        .nav-links button:hover, .btn:hover {
+            border-color: rgba(255, 145, 40, 0.60);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            border-color: transparent;
+            background: linear-gradient(135deg, #ff8b00, #e84f00);
+            color: #190b00;
+        }
+
+        .btn-green {
+            background: #123323;
+            border-color: #285d43;
+        }
+
+        .btn-danger {
+            background: #351414;
+            border-color: #6b2929;
+        }
+
+        main {
+            width: min(1400px, 92%);
+            margin: auto;
+            padding: 42px 0 70px;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 1.15fr .85fr;
+            align-items: center;
+            gap: 35px;
+            margin-bottom: 30px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 999px;
+            color: #6ff0ae;
+            background: #10291c;
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 1px;
+        }
+
+        h1 {
+            margin: 12px 0 18px;
+            font-size: clamp(42px, 6vw, 76px);
+            line-height: .95;
+        }
+
+        .orange { color: var(--orange); }
+
+        .hero p {
+            max-width: 760px;
+            color: var(--muted);
+            font-size: 18px;
+            line-height: 1.65;
+        }
+
+        .orange-orb {
+            width: min(290px, 70vw);
+            aspect-ratio: 1;
+            margin: auto;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background:
+                radial-gradient(circle at 35% 25%, #ffd98d 0, #ff9b1a 13%, #f46700 45%, #6c2500 73%, transparent 74%);
+            filter: drop-shadow(0 0 45px rgba(255,105,0,.30));
+            animation: float 5s ease-in-out infinite;
+        }
+
+        .orange-orb::after {
+            content: "🍊";
+            font-size: 110px;
+            filter: drop-shadow(0 12px 15px #0008);
+        }
+
+        @keyframes float {
+            50% { transform: translateY(-10px) rotate(2deg); }
+        }
+
+        .panel {
+            margin-bottom: 20px;
+            padding: 22px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: linear-gradient(145deg, rgba(36,20,9,.96), rgba(17,11,7,.96));
+            box-shadow: 0 18px 60px rgba(0,0,0,.25);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            margin-bottom: 20px;
+            padding-bottom: 2px;
+            scrollbar-width: thin;
+        }
+
+        .tab {
+            flex: 0 0 auto;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 13px;
+            color: var(--text);
+            background: #211307;
+            font-weight: 800;
+        }
+
+        .tab.active {
+            color: #1a0b00;
+            background: var(--orange);
+            border-color: transparent;
+        }
+
+        .section { display: none; }
+        .section.active { display: block; }
+
+        .search-row {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 10px;
+        }
+
+        .input {
+            width: 100%;
+            min-width: 0;
+            padding: 14px 15px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            outline: none;
+            color: white;
+            background: #0b0704;
+        }
+
+        .input::placeholder { color: #806f60; }
+        .input:focus { border-color: var(--orange); }
+
+        .status {
+            min-height: 22px;
+            margin-top: 12px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .status.good { color: var(--green); }
+        .status.warn { color: var(--yellow); }
+        .status.error { color: var(--red); }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-top: 18px;
+        }
+
+        .card {
+            min-height: 96px;
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            background: rgba(255,255,255,.025);
+        }
+
+        .label {
+            margin-bottom: 8px;
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+        }
+
+        .value {
+            overflow-wrap: anywhere;
+            font-size: 16px;
+            font-weight: 800;
+            line-height: 1.45;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            margin-top: 18px;
+        }
+
+        .three-columns {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+
+        iframe.map {
+            width: 100%;
+            height: 360px;
+            border: 0;
+            border-radius: 14px;
+            background: #080604;
+        }
+
+        pre {
+            min-height: 250px;
+            margin: 0;
+            padding: 16px;
+            overflow: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            color: #91ffc2;
+            background: #050805;
+            font: 13px/1.65 Consolas, monospace;
+        }
+
+        .big-number {
+            overflow-wrap: anywhere;
+            font-size: 30px;
+            font-weight: 900;
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+            overflow-wrap: anywhere;
+        }
+
+        th {
+            color: var(--muted);
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+
+        .empty {
+            padding: 35px;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        .footer {
+            margin-top: 25px;
+            color: #806f60;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        body::after {
+            content: "© 2026 VtDcs";
+            position: fixed;
+            right: 12px;
+            bottom: 10px;
+            z-index: 9999;
+            padding: 6px 10px;
+            border: 1px solid rgba(255,120,0,.18);
+            border-radius: 8px;
+            color: rgba(255,173,69,.55);
+            background: rgba(12,8,4,.72);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .5px;
+            pointer-events: none;
+            user-select: none;
+            backdrop-filter: blur(6px);
+        }
+
+        @media (max-width: 950px) {
+            .hero, .two-columns { grid-template-columns: 1fr; }
+            .cards { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 600px) {
+            .nav {
+                align-items: flex-start;
+                flex-direction: column;
+                padding: 15px 0;
+            }
+
+            .nav-links {
+                justify-content: flex-start;
+                width: 100%;
+            }
+
+            .nav-links button { flex: 1; }
+            .search-row { grid-template-columns: 1fr; }
+            .cards, .three-columns { grid-template-columns: 1fr; }
+            main { padding-top: 25px; }
+            .panel { padding: 15px; }
+            .hero p { font-size: 16px; }
+            .orange-orb { width: 210px; }
+            .orange-orb::after { font-size: 80px; }
+            table { font-size: 12px; }
+            th, td { padding: 8px; }
+
+            body::after {
+                right: 7px;
+                bottom: 7px;
+                font-size: 9px;
+                padding: 5px 7px;
+            }
+        }
+
+        @media print {
+            header, .tabs, .hero, .btn, body::after {
+                display: none !important;
+            }
+
+            body {
+                background: white;
+                color: black;
+            }
+
+            .panel, .card {
+                color: black;
+                background: white;
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="nav">
+        <div class="brand">
+            🍊 LARANJEX <span>NETWORK</span>
+        </div>
+
+        <div class="nav-links">
+            <button onclick="showTab('ip')">IP</button>
+            <button onclick="showTab('dns')">DNS</button>
+            <button onclick="showTab('domain')">DOMÍNIO</button>
+            <button onclick="showTab('connection')">CONEXÃO</button>
+            <button onclick="showTab('history')">HISTÓRICO</button>
+        </div>
+    </div>
+</header>
+
+<main>
+
+    <section class="hero">
+        <div>
+            <span class="badge">PUBLIC NETWORK INTELLIGENCE</span>
+
+            <h1>
+                Investigue um IP<br>
+                de forma <span class="orange">simples.</span>
+            </h1>
+
+            <p>
+                Digite qualquer IP público e veja informações disponíveis
+                publicamente, como ISP, organização, ASN, localização
+                aproximada, fuso horário e coordenadas.
+            </p>
+        </div>
+
+        <div class="orange-orb"></div>
+    </section>
+
+    <div class="panel">
+
+        <div class="tabs">
+
+            <button class="tab active" data-tab="ip" onclick="showTab('ip')">
+                🔎 IP Intelligence
+            </button>
+
+            <button class="tab" data-tab="dns" onclick="showTab('dns')">
+                🌐 DNS Explorer
+            </button>
+
+            <button class="tab" data-tab="domain" onclick="showTab('domain')">
+                🏠 Domain Intelligence
+            </button>
+
+            <button class="tab" data-tab="connection" onclick="showTab('connection')">
+                📡 Connection Test
+            </button>
+
+            <button class="tab" data-tab="history" onclick="showTab('history')">
+                📊 Relatórios
+            </button>
+
+        </div>
+
+        <section id="ip" class="section active">
+
+            <div class="search-row">
+
+                <input
+                    id="ipInput"
+                    class="input"
+                    type="text"
+                    autocomplete="off"
+                    placeholder="Digite um IP. Ex.: 8.8.8.8"
+                >
+
+                <button class="btn btn-primary" onclick="investigateIP()">
+                    🔎 ANALISAR IP
+                </button>
+
+                <button class="btn btn-green" onclick="discoverMyIP()">
+                    🌐 MEU IP
+                </button>
+
+            </div>
+
+            <div class="status" id="ipStatus">
+                Digite um IP e clique em "Analisar IP".
+            </div>
+
+            <div class="cards">
+
+                <div class="card">
+                    <div class="label">IP</div>
+                    <div class="value" id="resultIP">—</div>
+                </div>
+
+                <div class="card">
+                    <div class="label">Hostname / DNS reverso</div>
+                    <div class="value" id="resultHostname">—</div>
+                </div>
+
+                <div class="card">
+                    <div class="label">ISP</div>
+                    <div class="value" id="resultISP">—</div>
+                </div>
+
+                <div class="card">
+                    <div class="label">Organização</div>
+                    <div class="value" id="resultOrg">—</div>
+                </div>
+
+                <div class="card">
+                    <div class="label">ASN</div>
+                    <div class="value" id="resultASN">—</div>
+                </div>
+
+                <div class="card">
+                    <div class="label">Versão IP</div>
+                    <div class="value" id="resultVersion">—</div>
+                </div>
+
+                <div class="card">
+                    <div class="label">País</div>
+                    <div class="value" id="resultCountry">—</div>
+                </div>
+
+                <div class="card">
+                    <div class="label">Região / Estado</div>
+                    <div class="value" id="resultRegion">—</div>
+                </div>
+
+                <div class="card">
+                    <div class="label">Cidade</div>
+                    <div class="value" id="resultCity">—</div>
+                </div>
+
+                <div class="card">
+                    <div class="label">CEP / Postal</div>
+                    <div class="value" id="resultPostal">—</div>
+                </div>
+
+                <div class="card">
+                    <div class="label">Fuso horário</div>
+                    <div class="value" id="resultTimezone">—</div>
+                </div>
+
+                <div class="card">
+                    <div class="label">Coordenadas</div>
+                    <div class="value" id="resultCoordinates">—</div>
+                </div>
+
+            </div>
+
+            <div class="two-columns">
+
+                <div class="panel">
+
+                    <div class="label">
+                        Localização aproximada
+                    </div>
+
+                    <iframe
+                        id="map"
+                        class="map"
+                        loading="lazy"
+                        title="Mapa da localização aproximada"
+                    ></iframe>
+
+                </div>
+
+                <div class="panel">
+
+                    <div class="label">
+                        Log da consulta
+                    </div>
+
+                    <pre id="terminal">> sistema pronto
+> aguardando IP...</pre>
+
+                </div>
+
+            </div>
+
+            <div class="panel">
+
+                <div class="label">
+                    Segurança / informações extras
+                </div>
+
+                <div class="three-columns">
+
+                    <div class="card">
+                        <div class="label">VPN / Proxy</div>
+                        <div class="value" id="resultProxy">
+                            Não informado
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="label">Tor</div>
+                        <div class="value" id="resultTor">
+                            Não informado
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="label">Reputação</div>
+                        <div class="value" id="resultReputation">
+                            Não consultada
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="status">
+                    A localização obtida por IP é aproximada.
+                    Ela não representa necessariamente o endereço
+                    residencial do usuário.
+                </div>
+
+            </div>
+
+        </section>
+
+        <section id="dns" class="section">
+
+            <div class="search-row">
+
+                <input id="dnsInput" class="input" autocomplete="off" placeholder="Ex.: google.com">
+
+                <button class="btn btn-primary" onclick="lookupDNS()">
+                    🌐 CONSULTAR DNS
+                </button>
+
+                <button class="btn" onclick="clearDNS()">
+                    LIMPAR
+                </button>
+
+            </div>
+
+            <div class="status" id="dnsStatus"></div>
+
+            <div class="cards">
+
+                <div class="card">
+                    <div class="label">A - IPv4</div>
+                    <div class="value" id="dnsA">—</div>
+                </div>
+
+                <div class="card">
+                    <div class="label">AAAA - IPv6</div>
+                    <div class="value" id="dnsAAAA">—</div>
+                </div>
+
+                <div class="card">
+                    <div class="label">MX - E-mail</div>
+                    <div class="value" id="dnsMX">—</div>
+                </div>
+
+                <div class="card">
+                    <div class="label">NS - Nameserver</div>
+                    <div class="value" id="dnsNS">—</div>
+                </div>
+
+                <div class="card">
+                    <div class="label">TXT</div>
+                    <div class="value" id="dnsTXT">—</div>
+                </div>
+
+                <div class="card">
+                    <div class="label">CNAME</div>
+                    <div class="value" id="dnsCNAME">—</div>
+                </div>
+
+                <div class="card">
+                    <div class="label">TTL</div>
+                    <div class="value" id="dnsTTL">—</div>
+                </div>
+
+                <div class="card">
+                    <div class="label">Status</div>
+                    <div class="value" id="dnsResultStatus">—</div>
+                </div>
+
+            </div>
+
+        </section>
+
+        <section id="domain" class="section">
+
+            <div class="search-row">
+
+                <input id="domainInput" class="input" autocomplete="off" placeholder="Ex.: google.com">
+
+                <button class="btn btn-primary" onclick="lookupDomain()">
+                    🏠 ANALISAR DOMÍNIO
+                </button>
+
+                <button class="btn" onclick="clearDomain()">
+                    LIMPAR
+                </button>
+
+            </div>
+
+            <div class="status" id="domainStatus"></div>
+
+            <div class="cards">
+
+                <div class="card">
+                    <div class="label">Domínio</div>
+                    <div class="value" id="domainName">—</div>
+                </div>
+
+                <div class="card">
+                    <div class="label">IPv4</div>
+                    <div class="value" id="domainIPv4">—</div>
+                </div>
+
+                <div class="card">
+                    <div class="label">IPv6</div>
+                    <div class="value" id="domainIPv6">—</div>
+                </div>
+
+                <div class="card">
+                    <div class="label">Nameservers</div>
+                    <div class="value" id="domainNS">—</div>
+                </div>
+
+                <div class="card">
+                    <div class="label">MX</div>
+                    <div class="value" id="domainMX">—</div>
+                </div>
+
+                <div class="card">
+                    <div class="label">TXT</div>
+                    <div class="value" id="domainTXT">—</div>
+                </div>
+
+                <div class="card">
+                    <div class="label">CNAME</div>
+                    <div class="value" id="domainCNAME">—</div>
+                </div>
+
+                <div class="card">
+                    <div class="label">URL</div>
+                    <div class="value" id="domainURL">—</div>
+                </div>
+
+            </div>
+
+        </section>
+
+        <section id="connection" class="section">
+
+            <div class="three-columns">
+
+                <div class="card">
+                    <div class="label">IP público</div>
+                    <div class="big-number" id="connectionIP">—</div>
+                </div>
+
+                <div class="card">
+                    <div class="label">Internet</div>
+                    <div class="big-number" id="connectionOnline">—</div>
+                </div>
+
+                <div class="card">
+                    <div class="label">Latência</div>
+                    <div class="big-number" id="connectionLatency">—</div>
+                </div>
+
+            </div>
+
+            <div class="panel" style="margin-top: 18px;">
+
+                <button class="btn btn-primary" onclick="testConnection()">
+                    ⚡ TESTAR CONEXÃO
+                </button>
+
+                <div class="cards">
+
+                    <div class="card">
+                        <div class="label">IPv4</div>
+                        <div class="value" id="connectionIPv4">—</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="label">IPv6</div>
+                        <div class="value" id="connectionIPv6">—</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="label">Navegador</div>
+                        <div class="value" id="connectionBrowser">—</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="label">Sistema</div>
+                        <div class="value" id="connectionOS">—</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="label">Idioma</div>
+                        <div class="value" id="connectionLanguage">—</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="label">Fuso</div>
+                        <div class="value" id="connectionTimezone">—</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="label">Tela</div>
+                        <div class="value" id="connectionScreen">—</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="label">Cookies</div>
+                        <div class="value" id="connectionCookies">—</div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <section id="history" class="section">
+
+            <div class="panel">
+
+                <button class="btn btn-primary" onclick="window.print()">
+                    📄 IMPRIMIR RELATÓRIO
+                </button>
+
+                <button class="btn" onclick="exportHistory()">
+                    ⬇️ EXPORTAR JSON
+                </button>
+
+                <button class="btn btn-danger" onclick="clearHistory()">
+                    🗑️ LIMPAR HISTÓRICO
+                </button>
+
+            </div>
+
+            <div class="panel">
+
+                <div class="label">
+                    Últimas consultas
+                </div>
+
+                <div id="historyBox"></div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+    <div class="footer">
+        Laranjex Network • Informações públicas •
+        Localização por IP é aproximada.<br>
+        © 2026 VtDcs
+    </div>
+
+</main>
+
+<script>
+"use strict";
+
+/* ============================================================
+   LARANJEX NETWORK
+   Desenvolvido por VtDcs
+   © 2026 VtDcs
+============================================================ */
+
+function getElement(id) {
+    return document.getElementById(id);
+}
+
+function setText(id, value) {
+    const element = getElement(id);
+
+    if (!element) return;
+
+    element.textContent =
+        value === undefined ||
+        value === null ||
+        value === ""
+            ? "—"
+            : String(value);
+}
+
+function setStatus(id, message, type = "") {
+    const element = getElement(id);
+
+    if (!element) return;
+
+    element.textContent = message;
+    element.className = "status " + type;
+}
+
+function writeTerminal(message) {
+    setText("terminal", message);
+}
+
+function escapeHTML(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+/* ABAS */
+
+function showTab(tabId) {
+
+    document
+        .querySelectorAll(".section")
+        .forEach(section => {
+            section.classList.remove("active");
+        });
+
+    document
+        .querySelectorAll(".tab")
+        .forEach(button => {
+            button.classList.remove("active");
+        });
+
+    const section = getElement(tabId);
+
+    if (section) {
+        section.classList.add("active");
+    }
+
+    const button = document.querySelector(
+        `[data-tab="${CSS.escape(tabId)}"]`
+    );
+
+    if (button) {
+        button.classList.add("active");
+    }
+
+    if (tabId === "history") {
+        renderHistory();
+    }
+}
+
+/* VALIDAÇÃO DE IP */
+
+function isValidIPv4(ip) {
+
+    const parts = ip.split(".");
+
+    if (parts.length !== 4) {
+        return false;
+    }
+
+    return parts.every(part => {
+
+        if (!/^\d+$/.test(part)) {
+            return false;
+        }
+
+        if (part.length > 1 && part.startsWith("0")) {
+            return false;
+        }
+
+        const number = Number(part);
+
+        return number >= 0 && number <= 255;
+    });
+}
+
+function isValidIPv6(ip) {
+
+    if (!ip || !ip.includes(":")) {
+        return false;
+    }
+
+    if (!/^[0-9a-fA-F:]+$/.test(ip)) {
+        return false;
+    }
+
+    if (ip.includes(":::")) {
+        return false;
+    }
+
+    const groups = ip.split(":");
+
+    if (ip.includes("::")) {
+
+        const doubleColonCount =
+            (ip.match(/::/g) || []).length;
+
+        if (doubleColonCount > 1) {
+            return false;
+        }
+
+        if (groups.length > 8) {
+            return false;
+        }
+
+    } else {
+
+        if (groups.length !== 8) {
+            return false;
+        }
+    }
+
+    for (const group of groups) {
+
+        if (group.length > 4) {
+            return false;
+        }
+
+        if (!/^[0-9a-fA-F]*$/.test(group)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function isValidIP(ip) {
+
+    if (!ip) {
+        return false;
+    }
+
+    const value = ip.trim();
+
+    if (value.includes(".")) {
+        return isValidIPv4(value);
+    }
+
+    if (value.includes(":")) {
+        return isValidIPv6(value);
+    }
+
+    return false;
+}
+
+/* FETCH COM TIMEOUT */
+
+async function fetchJSON(url, options = {}, timeout = 10000) {
+
+    const controller = new AbortController();
+
+    const timer = setTimeout(() => {
+        controller.abort();
+    }, timeout);
+
+    try {
+
+        const response = await fetch(url, {
+            ...options,
+            signal: controller.signal
+        });
+
+        if (!response.ok) {
+            throw new Error("HTTP " + response.status);
+        }
+
+        return await response.json();
+
+    } finally {
+        clearTimeout(timer);
+    }
+}
+
+/* CONSULTA DE IP */
+
+async function getIPInformation(ip = "") {
+
+    const encodedIP = encodeURIComponent(ip);
+
+    let firstError = null;
+
+    try {
+
+        const url = ip
+            ? `https://ipapi.co/${encodedIP}/json/`
+            : "https://ipapi.co/json/";
+
+        const data = await fetchJSON(url);
+
+        if (data.error) {
+            throw new Error(
+                data.reason ||
+                "IPAPI não encontrou o IP."
+            );
+        }
+
+        return normalizeIPAPI(data);
+
+    } catch (error) {
+        firstError = error;
+    }
+
+    try {
+
+        const url = ip
+            ? `https://ipwho.is/${encodedIP}`
+            : "https://ipwho.is/";
+
+        const data = await fetchJSON(url);
+
+        if (!data.success) {
+            throw new Error(
+                data.message ||
+                "IPWHO não encontrou o IP."
+            );
+        }
+
+        return normalizeIPWHO(data);
+
+    } catch (error) {
+
+        throw new Error(
+            "As APIs de consulta não responderam. " +
+            "Primeiro erro: " +
+            (firstError
+                ? firstError.message
+                : "desconhecido") +
+            " | Segundo erro: " +
+            error.message
+        );
+    }
+}
+
+/* NORMALIZAÇÃO IPAPI */
+
+function normalizeIPAPI(data) {
+
+    return {
+
+        ip: data.ip,
+
+        hostname:
+            data.hostname ||
+            "Não informado",
+
+        isp:
+            data.org ||
+            "Não informado",
+
+        organization:
+            data.org ||
+            "Não informado",
+
+        asn:
+            data.asn ||
+            "Não informado",
+
+        version:
+            data.version ||
+            "Não informado",
+
+        country:
+            data.country_name ||
+            data.country ||
+            "Não informado",
+
+        region:
+            data.region ||
+            "Não informado",
+
+        city:
+            data.city ||
+            "Não informado",
+
+        postal:
+            data.postal ||
+            "Não informado",
+
+        timezone:
+            data.timezone ||
+            "Não informado",
+
+        latitude:
+            Number(data.latitude),
+
+        longitude:
+            Number(data.longitude),
+
+        proxy:
+            "Não informado",
+
+        tor:
+            "Não informado"
+    };
+}
+
+/* NORMALIZAÇÃO IPWHO */
+
+function normalizeIPWHO(data) {
+
+    return {
+
+        ip: data.ip,
+
+        hostname:
+            data.hostname ||
+            data.reverse ||
+            "Não informado",
+
+        isp:
+            data.connection?.isp ||
+            "Não informado",
+
+        organization:
+            data.connection?.org ||
+            "Não informado",
+
+        asn:
+            data.connection?.asn ||
+            "Não informado",
+
+        version:
+            data.type ||
+            "Não informado",
+
+        country:
+            data.country ||
+            "Não informado",
+
+        region:
+            data.region ||
+            "Não informado",
+
+        city:
+            data.city ||
+            "Não informado",
+
+        postal:
+            "Não informado",
+
+        timezone:
+            data.timezone?.id ||
+            "Não informado",
+
+        latitude:
+            Number(data.latitude),
+
+        longitude:
+            Number(data.longitude),
+
+        proxy:
+            data.security?.is_proxy
+                ? "Detectado"
+                : "Não detectado",
+
+        tor:
+            data.security?.is_tor
+                ? "Detectado"
+                : "Não detectado"
+    };
+}
+
+/* MOSTRAR DADOS */
+
+function displayIPInformation(data) {
+
+    setText("resultIP", data.ip);
+    setText("resultHostname", data.hostname);
+    setText("resultISP", data.isp);
+    setText("resultOrg", data.organization);
+    setText("resultASN", data.asn);
+    setText("resultVersion", data.version);
+    setText("resultCountry", data.country);
+    setText("resultRegion", data.region);
+    setText("resultCity", data.city);
+    setText("resultPostal", data.postal);
+    setText("resultTimezone", data.timezone);
+
+    if (
+        Number.isFinite(data.latitude) &&
+        Number.isFinite(data.longitude)
+    ) {
+
+        setText(
+            "resultCoordinates",
+            `${data.latitude}, ${data.longitude}`
+        );
+
+        showMap(
+            data.latitude,
+            data.longitude
+        );
+
+    } else {
+
+        setText(
+            "resultCoordinates",
+            "Não informado"
+        );
+
+        const map = getElement("map");
+
+        if (map) {
+            map.removeAttribute("src");
+        }
+    }
+
+    setText("resultProxy", data.proxy);
+    setText("resultTor", data.tor);
+    setText("resultReputation", "Não consultada");
+}
+
+/* MAPA */
+
+function showMap(latitude, longitude) {
+
+    const delta = 0.08;
+
+    const bbox = [
+        longitude - delta,
+        latitude - delta,
+        longitude + delta,
+        latitude + delta
+    ].join("%2C");
+
+    const mapURL =
+        "https://www.openstreetmap.org/export/embed.html" +
+        `?bbox=${bbox}` +
+        "&layer=mapnik" +
+        `&marker=${latitude}%2C${longitude}`;
+
+    const map = getElement("map");
+
+    if (map) {
+        map.src = mapURL;
+    }
+}
+
+/* ANALISAR IP */
+
+async function investigateIP() {
+
+    const input = getElement("ipInput");
+
+    if (!input) return;
+
+    const ip = input.value.trim();
+
+    if (!ip) {
+
+        setStatus(
+            "ipStatus",
+            "Digite um IP primeiro.",
+            "warn"
+        );
+
+        input.focus();
+
+        return;
+    }
+
+    if (!isValidIP(ip)) {
+
+        setStatus(
+            "ipStatus",
+            "IP inválido. Exemplo válido: 8.8.8.8",
+            "error"
+        );
+
+        return;
+    }
+
+    setStatus(
+        "ipStatus",
+        "Consultando " + ip + " ..."
+    );
+
+    writeTerminal(
+        "> iniciando consulta\n" +
+        "> IP informado: " + ip + "\n" +
+        "> conectando às APIs públicas..."
+    );
+
+    try {
+
+        const data =
+            await getIPInformation(ip);
+
+        displayIPInformation(data);
+
+        writeTerminal(
+            "> consulta concluída\n\n" +
+            "IP: " + data.ip + "\n" +
+            "ISP: " + data.isp + "\n" +
+            "ASN: " + data.asn + "\n" +
+            "País: " + data.country + "\n" +
+            "Região: " + data.region + "\n" +
+            "Cidade: " + data.city + "\n" +
+            "Coordenadas: " +
+            (Number.isFinite(data.latitude)
+                ? data.latitude
+                : "—") +
+            ", " +
+            (Number.isFinite(data.longitude)
+                ? data.longitude
+                : "—")
+        );
+
+        saveHistory({
+            type: "IP",
+            value: data.ip,
+            city: data.city,
+            country: data.country,
+            time: new Date().toLocaleString("pt-BR")
+        });
+
+        setStatus(
+            "ipStatus",
+            "IP consultado com sucesso. Os dados são públicos e a localização é aproximada.",
+            "good"
+        );
+
+    } catch (error) {
+
+        writeTerminal(
+            "> ERRO NA CONSULTA\n\n" +
+            error.message
+        );
+
+        setStatus(
+            "ipStatus",
+            error.message,
+            "error"
+        );
+    }
+}
+
+/* DESCOBRIR MEU IP */
+
+async function discoverMyIP() {
+
+    setStatus(
+        "ipStatus",
+        "Descobrindo seu IP público..."
+    );
+
+    try {
+
+        const data =
+            await getIPInformation();
+
+        const input =
+            getElement("ipInput");
+
+        if (input) {
+            input.value = data.ip;
+        }
+
+        displayIPInformation(data);
+
+        writeTerminal(
+            "> seu IP público foi encontrado\n\n" +
+            "IP: " + data.ip + "\n" +
+            "ISP: " + data.isp + "\n" +
+            "Cidade: " + data.city + "\n" +
+            "País: " + data.country
+        );
+
+        saveHistory({
+            type: "IP",
+            value: data.ip,
+            city: data.city,
+            country: data.country,
+            time: new Date().toLocaleString("pt-BR")
+        });
+
+        setStatus(
+            "ipStatus",
+            "Seu IP público foi encontrado.",
+            "good"
+        );
+
+    } catch (error) {
+
+        setStatus(
+            "ipStatus",
+            "Não foi possível descobrir seu IP: " +
+            error.message,
+            "error"
+        );
+    }
+}
+
+/* DNS OVER HTTPS */
+
+async function queryDNS(domain, type) {
+
+    const googleURL =
+        "https://dns.google/resolve" +
+        `?name=${encodeURIComponent(domain)}` +
+        `&type=${type}`;
+
+    try {
+
+        return await fetchJSON(
+            googleURL,
+            {
+                headers: {
+                    "Accept": "application/dns-json"
+                }
+            }
+        );
+
+    } catch (googleError) {
+
+        const cloudflareURL =
+            "https://cloudflare-dns.com/dns-query" +
+            `?name=${encodeURIComponent(domain)}` +
+            `&type=${type}`;
+
+        return await fetchJSON(
+            cloudflareURL,
+            {
+                headers: {
+                    "Accept": "application/dns-json"
+                }
+            }
+        );
+    }
+}
+
+function dnsAnswers(data) {
+
+    if (
+        !data ||
+        !Array.isArray(data.Answer) ||
+        data.Answer.length === 0
+    ) {
+        return "Não encontrado";
+    }
+
+    return data.Answer
+        .map(answer => answer.data)
+        .join("\n");
+}
+
+function normalizeDomain(value) {
+
+    return value
+        .trim()
+        .replace(/^https?:\/\//i, "")
+        .split("/")[0]
+        .split("?")[0]
+        .split("#")[0]
+        .toLowerCase();
+}
+
+/* DNS */
+
+async function lookupDNS() {
+
+    const input = getElement("dnsInput");
+
+    const domain =
+        normalizeDomain(input?.value || "");
+
+    if (!domain) {
+
+        setStatus(
+            "dnsStatus",
+            "Digite um domínio.",
+            "warn"
+        );
+
+        return;
+    }
+
+    setStatus(
+        "dnsStatus",
+        "Consultando registros DNS..."
+    );
+
+    try {
+
+        const types = [
+            "A",
+            "AAAA",
+            "MX",
+            "NS",
+            "TXT",
+            "CNAME"
+        ];
+
+        const results = {};
+
+        for (const type of types) {
+            results[type] =
+                await queryDNS(domain, type);
+        }
+
+        setText("dnsA", dnsAnswers(results.A));
+        setText("dnsAAAA", dnsAnswers(results.AAAA));
+        setText("dnsMX", dnsAnswers(results.MX));
+        setText("dnsNS", dnsAnswers(results.NS));
+        setText("dnsTXT", dnsAnswers(results.TXT));
+        setText("dnsCNAME", dnsAnswers(results.CNAME));
+
+        const firstRecord =
+            results.A?.Answer?.[0] ||
+            results.AAAA?.Answer?.[0];
+
+        setText(
+            "dnsTTL",
+            firstRecord?.TTL ||
+            "Não informado"
+        );
+
+        setText(
+            "dnsResultStatus",
+            "OK"
+        );
+
+        setStatus(
+            "dnsStatus",
+            "Consulta DNS concluída.",
+            "good"
+        );
+
+    } catch (error) {
+
+        setStatus(
+            "dnsStatus",
+            "Erro DNS: " + error.message,
+            "error"
+        );
+    }
+}
+
+function clearDNS() {
+
+    [
+        "dnsA",
+        "dnsAAAA",
+        "dnsMX",
+        "dnsNS",
+        "dnsTXT",
+        "dnsCNAME",
+        "dnsTTL",
+        "dnsResultStatus"
+    ].forEach(id => {
+        setText(id, "—");
+    });
+
+    setStatus(
+        "dnsStatus",
+        ""
+    );
+}
+
+/* DOMÍNIO */
+
+async function lookupDomain() {
+
+    const input =
+        getElement("domainInput");
+
+    const domain =
+        normalizeDomain(input?.value || "");
+
+    if (!domain) {
+
+        setStatus(
+            "domainStatus",
+            "Digite um domínio.",
+            "warn"
+        );
+
+        return;
+    }
+
+    setStatus(
+        "domainStatus",
+        "Analisando domínio..."
+    );
+
+    try {
+
+        const types = [
+            "A",
+            "AAAA",
+            "MX",
+            "NS",
+            "TXT",
+            "CNAME"
+        ];
+
+        const result = {};
+
+        for (const type of types) {
+            result[type] =
+                await queryDNS(
+                    domain,
+                    type
+                );
+        }
+
+        setText("domainName", domain);
+        setText("domainIPv4", dnsAnswers(result.A));
+        setText("domainIPv6", dnsAnswers(result.AAAA));
+        setText("domainNS", dnsAnswers(result.NS));
+        setText("domainMX", dnsAnswers(result.MX));
+        setText("domainTXT", dnsAnswers(result.TXT));
+        setText("domainCNAME", dnsAnswers(result.CNAME));
+        setText("domainURL", "https://" + domain);
+
+        saveHistory({
+            type: "DOMÍNIO",
+            value: domain,
+            city: "—",
+            country: "—",
+            time: new Date().toLocaleString("pt-BR")
+        });
+
+        setStatus(
+            "domainStatus",
+            "Domínio analisado.",
+            "good"
+        );
+
+    } catch (error) {
+
+        setStatus(
+            "domainStatus",
+            "Erro: " + error.message,
+            "error"
+        );
+    }
+}
+
+function clearDomain() {
+
+    [
+        "domainName",
+        "domainIPv4",
+        "domainIPv6",
+        "domainNS",
+        "domainMX",
+        "domainTXT",
+        "domainCNAME",
+        "domainURL"
+    ].forEach(id => {
+        setText(id, "—");
+    });
+
+    setStatus(
+        "domainStatus",
+        ""
+    );
+}
+
+/* TESTE DE CONEXÃO */
+
+async function testConnection() {
+
+    setText(
+        "connectionOnline",
+        navigator.onLine
+            ? "ONLINE"
+            : "OFFLINE"
+    );
+
+    setText(
+        "connectionLanguage",
+        navigator.language
+    );
+
+    setText(
+        "connectionTimezone",
+        Intl.DateTimeFormat()
+            .resolvedOptions()
+            .timeZone
+    );
+
+    setText(
+        "connectionScreen",
+        `${screen.width} × ${screen.height}`
+    );
+
+    setText(
+        "connectionCookies",
+        navigator.cookieEnabled
+            ? "Ativados"
+            : "Desativados"
+    );
+
+    setText(
+        "connectionBrowser",
+        detectBrowser()
+    );
+
+    setText(
+        "connectionOS",
+        detectOS()
+    );
+
+    if (!navigator.onLine) {
+
+        setText(
+            "connectionIP",
+            "Offline"
+        );
+
+        setText(
+            "connectionLatency",
+            "Indisponível"
+        );
+
+        return;
+    }
+
+    const start =
+        performance.now();
+
+    try {
+
+        const data =
+            await getIPInformation();
+
+        const elapsed =
+            Math.round(
+                performance.now() - start
+            );
+
+        setText(
+            "connectionIP",
+            data.ip
+        );
+
+        setText(
+            "connectionIPv4",
+            data.version === "IPv4"
+                ? data.ip
+                : "Não identificado"
+        );
+
+        setText(
+            "connectionIPv6",
+            data.version === "IPv6"
+                ? data.ip
+                : "Não identificado"
+        );
+
+        setText(
+            "connectionLatency",
+            elapsed + " ms"
+        );
+
+    } catch (error) {
+
+        setText(
+            "connectionIP",
+            "Erro"
+        );
+
+        setText(
+            "connectionLatency",
+            "Indisponível"
+        );
+    }
+}
+
+/* DETECTAR NAVEGADOR */
+
+function detectBrowser() {
+
+    const ua =
+        navigator.userAgent;
+
+    if (ua.includes("Edg/")) {
+        return "Microsoft Edge";
+    }
+
+    if (
+        ua.includes("Chrome/") &&
+        !ua.includes("Edg/")
+    ) {
+        return "Google Chrome";
+    }
+
+    if (ua.includes("Firefox/")) {
+        return "Mozilla Firefox";
+    }
+
+    if (
+        ua.includes("Safari/") &&
+        !ua.includes("Chrome/")
+    ) {
+        return "Safari";
+    }
+
+    return "Desconhecido";
+}
+
+/* DETECTAR SISTEMA */
+
+function detectOS() {
+
+    const ua =
+        navigator.userAgent;
+
+    if (/Windows/i.test(ua)) {
+        return "Windows";
+    }
+
+    if (/Android/i.test(ua)) {
+        return "Android";
+    }
+
+    if (/iPhone|iPad|iPod/i.test(ua)) {
+        return "iOS";
+    }
+
+    if (/Mac/i.test(ua)) {
+        return "macOS";
+    }
+
+    if (/Linux/i.test(ua)) {
+        return "Linux";
+    }
+
+    return "Desconhecido";
+}
+
+/* HISTÓRICO */
+
+let historyData = [];
+
+try {
+
+    const stored =
+        localStorage.getItem(
+            "laranjexHistory"
+        );
+
+    historyData =
+        stored
+            ? JSON.parse(stored)
+            : [];
+
+    if (!Array.isArray(historyData)) {
+        historyData = [];
+    }
+
+} catch (error) {
+    historyData = [];
+}
+
+function saveHistory(item) {
+
+    historyData.unshift(item);
+
+    historyData =
+        historyData.slice(0, 30);
+
+    try {
+
+        localStorage.setItem(
+            "laranjexHistory",
+            JSON.stringify(historyData)
+        );
+
+    } catch (error) {
+
+        console.warn(
+            "Não foi possível salvar o histórico:",
+            error
+        );
+    }
+
+    renderHistory();
+}
+
+function renderHistory() {
+
+    const box =
+        getElement("historyBox");
+
+    if (!box) {
+        return;
+    }
+
+    if (!historyData.length) {
+
+        box.innerHTML =
+            '<div class="empty">' +
+            'Nenhuma consulta realizada ainda.' +
+            '</div>';
+
+        return;
+    }
+
+    let html = `
+        <table>
+            <thead>
+                <tr>
+                    <th>Tipo</th>
+                    <th>Consulta</th>
+                    <th>Local</th>
+                    <th>Data</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    historyData.forEach(item => {
+
+        html += `
+            <tr>
+                <td>${escapeHTML(item.type)}</td>
+                <td>${escapeHTML(item.value)}</td>
+                <td>
+                    ${escapeHTML(item.city || "—")}
+                    ${escapeHTML(item.country || "")}
+                </td>
+                <td>${escapeHTML(item.time)}</td>
+            </tr>
+        `;
+
+    });
+
+    html += `
+            </tbody>
+        </table>
+    `;
+
+    box.innerHTML = html;
+}
+
+function clearHistory() {
+
+    historyData = [];
+
+    try {
+
+        localStorage.removeItem(
+            "laranjexHistory"
+        );
+
+    } catch (error) {
+
+        console.warn(
+            "Não foi possível limpar o histórico:",
+            error
+        );
+    }
+
+    renderHistory();
+}
+
+function exportHistory() {
+
+    const content =
+        JSON.stringify(
+            {
+                generatedAt:
+                    new Date().toISOString(),
+
+                author:
+                    "VtDcs",
+
+                history:
+                    historyData
+            },
+            null,
+            2
+        );
+
+    const blob =
+        new Blob(
+            [content],
+            {
+                type: "application/json"
+            }
+        );
+
+    const url =
+        URL.createObjectURL(blob);
+
+    const link =
+        document.createElement("a");
+
+    link.href = url;
+
+    link.download =
+        "laranjex-network-report.json";
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    link.remove();
+
+    setTimeout(() => {
+        URL.revokeObjectURL(url);
+    }, 1000);
+}
+
+/* ENTER NOS CAMPOS */
+
+const ipInput =
+    getElement("ipInput");
+
+if (ipInput) {
+
+    ipInput.addEventListener(
+        "keydown",
+        event => {
+
+            if (event.key === "Enter") {
+                investigateIP();
+            }
+        }
+    );
+}
+
+const dnsInput =
+    getElement("dnsInput");
+
+if (dnsInput) {
+
+    dnsInput.addEventListener(
+        "keydown",
+        event => {
+
+            if (event.key === "Enter") {
+                lookupDNS();
+            }
+        }
+    );
+}
+
+const domainInput =
+    getElement("domainInput");
+
+if (domainInput) {
+
+    domainInput.addEventListener(
+        "keydown",
+        event => {
+
+            if (event.key === "Enter") {
+                lookupDomain();
+            }
+        }
+    );
+}
+
+/* INICIALIZAÇÃO */
+
+renderHistory();
+
+console.log(
+    "%cLaranjex Network",
+    "color:#ff7800;font-size:20px;font-weight:bold;"
+);
+
+console.log(
+    "%c© 2026 VtDcs",
+    "color:#ffad45;font-size:12px;"
+);
+
+</script>
+
+</body>
+</html>
